@@ -1,0 +1,84 @@
+body{
+    color: black;
+}
+
+header{
+    background-color: #114D57;
+    color: #008080;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 2%;
+}
+
+footer{
+    color: #008080;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 2%;
+    width:80%;
+}
+
+
+/* Note: this works when run locally as flask app - does not work on product in live production via apache2 setup */
+@font-face {
+   font-family: colaFont;
+   src: url('LOKICOLA.ttf');
+}
+
+/* to get google font to work use font-family: 'Dancing Script', cursive; 
+also be sure to uncomment style import in index.html */
+
+h1,h2,h3 {
+   font-family: colaFont;
+   text-align:center;
+}
+
+#weather{
+    background-color: white;
+    color: black;
+    width: 30%;
+    overflow: hidden;
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-bottom: 20px;
+    display: inline-block;
+    padding: 20px;
+    border-radius: 25px;
+    border-style: groove;
+    border-color: light-blue;
+    text-align:center;
+}
+
+#historicwrapper{
+    background-color: white;
+    color: black;
+    width: 30%;
+    overflow: hidden;
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-bottom: 20px;
+    display: none;
+    padding: 20px;
+    border-radius: 25px;
+    border-style: groove; 
+    border-color: light-blue;
+    text-align:center;
+}
+
+#historic{
+    background-color: white;
+    color: black;
+    overflow: hidden;
+    margin-bottom:20px;
+    margin:auto;
+    padding:20px;
+    border-radius: 25px;
+    border-style: groove;
+    border-color: light-blue;
+}
+
+#historic p{
+    text-align:center;
+}

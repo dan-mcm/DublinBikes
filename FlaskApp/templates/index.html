@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<link rel = "stylesheet"
+      type = "text/css"
+        href = "/static/style.css" />
+
+<!-- custom google font - uncomment here and in css to get working - using on EC2 due to
+complications with the local .ttf lokifont file
+<link href="https://fonts.googleapis.com/css?family=Dancing+Script:700" rel="stylesheet">
+-->
+
+<title>Bike Tracker</title>  
+{{trdmap.js}}
+</head>
+
+
+<body onload="api()">
+
+<header>
+<img src="/static/DublinBikes.jpg"/>
+</header>
+
+
+
+<div id="map">{{trdmap.html}}</div>
+
+<div id="weather"></div>
+
+<div id="historicwrapper">
+    <div id="historic"></div>
+    <div id="averagechart"></div>
+    <div id="weeklybikes"></div>
+</div>
+
+<footer>
+<p>Developed by SDD - Software Design & Development</p>
+</footer>
+
+
+<!-- code for weather data -->
+<script type="text/javascript">
+    function api(){
+        var api_key = '44b78ac274e9d94337e6620489fdcdbe';
+        
+        var url = $.getJSON("http://api.openweathermap.org/data/2.5/weather?q=Dublin,IE&units=metric&APPID=" + api_key, function(data){
+
+        console.log("success");
+            
+    document.getElementById("weather").style.display = "inline-block";
+    document.getElementById("weather").innerHTML = '<h1>Current Weather in Dublin</h1>' + 
+        '<p>' + "Temperature: " + data.main.temp + '&deg;C' + '</p>'
+        + '<p>' + "Humidity: " + data.main.humidity + '%' + '</p>' 
+        + '<p>' + "Wind Speed: " + data.wind.speed + 'km/h' + '</p>'         
+        + '<p>' + "<img src=\"http://openweathermap.org/img/w/" + data.weather[0].icon + ".png\">" + '</p>';
+    })
+}
+</script> 
+
+<!-- code for showing div on button click and passing variable info into google visualisation functions -->    
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script type="text/javascript">
+    
+   function showDiv(stationName,stationNumber) {
+    
+    //note: this link is hardcoded to port 5000! when running through apache 2 you need http://IP:80/station/ or simply http://IP/station
+    var jqxhr = $.getJSON("http://localhost:5000/station/" + stationNumber, function(data){
+    console.log("http://localhost:5000/station/" + stationNumber);    
+
+    console.log("success");
+
+    var availableBikes = data.data[0].available_bikes;
+    var availableBikeStands = data.data[0].available_bike_stands;
+    var lastUpdate = data.data[0].last_update;
+    
+    var monday = 0;
+    var tuesday = 0;
+    var wednesday = 0;
+    var thursday = 0;
+    var friday = 0;
+    var saturday = 0;
+    var sunday = 0;
+    
+    //for each day we cycle from i up to the cut off value for that specific day using an SQL query
+    //initially attempted to code into python being sent here however caused issues
+    //sample sql query used in workbench to calculate the ranges:
+        
+    //for (var SELECT COUNT(*)
+    //from dublinbikes.stationDynamic 
+    //where number = 5 AND last_update LIKE '03-04-2017%'i=0; i < 2016; i++) 
+        
+    //these values let us check the limit of the first day in the database
+    //we then start at the next day after the end limit of the day before up to that number + the new count value
+        
+    //monday note: scraper ran from monday 3rd april at 11pm - as only 11 scrapes on the 3rd April using 10th april info instead
+    for (var i=1725; i < 2012; i++)   
+    {    
+        monday += parseInt(JSON.stringify(data.data[i].available_bikes));
+    }
+        
+    monday = Math.round(monday/286); //dividing by total number of values to get average
+        
+        
+        
+    //tuesday    
+    for (var i=11; i < 299; i++)   
+    {    
+        tuesday += parseInt(JSON.stringify(data.data[i].available_bikes));
+    }
+        
+    tuesday = Math.round(tuesday/287);
+        
+        
+    //wednesday
+    for (var i=299; i < 585; i++)   
+    {    
+        wednesday += parseInt(JSON.stringify(data.data[i].available_bikes));
+    }
+        
+    wednesday = Math.round(wednesday/287);
+        
+        
+    //thursday 
+    for (var i=585; i < 868; i++)   
+    {    
+        thursday += parseInt(JSON.stringify(data.data[i].available_bikes));
+    }
+        
+    thursday = Math.round(thursday/283);
+        
+        
+    //friday  
+    for (var i=868; i < 1154; i++)   
+    {    
+        friday += parseInt(JSON.stringify(data.data[i].available_bikes));
+    }
+        
+    friday = Math.round(friday/286);
+        
+        
+    //saturday
+    for (var i=1154; i < 1440; i++)   
+    {    
+        saturday += parseInt(JSON.stringify(data.data[i].available_bikes));
+    }
+        
+    saturday = Math.round(saturday/286);
+        
+        
+    //sunday
+    for (var i=1440; i < 1725; i++)   
+    {    
+        sunday += parseInt(JSON.stringify(data.data[i].available_bikes));
+    }
+        
+    sunday = Math.round(sunday/285);
+    
+    //setting up variables for second graph - total weekly bike usage
+    var averageAvailableBikes = ((monday+tuesday+wednesday+thursday+friday+saturday+sunday)/7); //note: average statistics
+    var averageAvailableStations = 0; //note: average statistics
+        
+    for (var i=11; i < 2012; i++)   
+    {    
+        averageAvailableStations += parseInt(JSON.stringify(data.data[i].available_bike_stands));
+    }
+    
+    averageAvailableStations = averageAvailableStations/2001;
+        
+    document.getElementById('historicwrapper').style.display = "inline-block";
+    console.log("Button Pressed Test - Station Name: " + stationName);
+        
+    document.getElementById('historic').innerHTML = "<h1>Historic Data</h1>" + "<p>Station Name: " + stationName + "</p>";
+    google.charts.setOnLoadCallback(drawChart(monday,tuesday,wednesday,thursday,friday,saturday,sunday));
+    google.charts.setOnLoadCallback(drawChart2(averageAvailableBikes,averageAvailableStations));
+      
+        
+    }) 
+    
+    .done(function(){
+        console.log("second success");
+    })
+    
+    .fail(function(){
+          console.log("error");
+    })
+    
+    .always(function(){
+        console.log("complete");
+    });
+
+}
+    
+</script>
+
+
+    
+<!-- script for google visualisation 1 -->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+      
+
+    function drawChart(mon,tues,weds,thurs,fri,sat,sun) {
+        var data = google.visualization.arrayToDataTable([
+          ['Day', 'Bikes Available'],
+          ['Mon',  mon],
+          ['Tues',  tues],
+          ['Weds',  weds],
+          ['Thurs',  thurs],
+          ['Fri',  fri],
+          ['Sat',  sat],
+          ['Sun',  sun]
+        ]);
+
+        var options = {
+          title: 'Average Number of Bikes Available',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+    var chart = new google.visualization.LineChart(document.getElementById('averagechart'));
+
+    chart.draw(data, options);
+    }
+    
+</script>
+    
+<!-- script for google visualisation 2 -->
+<script type="text/javascript">
+        
+      google.charts.load("current", {packages:["corechart"]});
+      
+    
+        
+      function drawChart2(testVariable) {
+        var data2 = google.visualization.arrayToDataTable([
+          ['Bikes', 'Average Number'],
+          ['Average Available Bikes', testVariable],
+          ['Average Available Stands', 10]
+        ]);
+
+        var options2 = {
+          title: 'Average Weekly Bikes Available',
+          pieHole: 0.4,
+        };
+
+        var chart2 = new google.visualization.PieChart(document.getElementById('weeklybikes'));
+        chart2.draw(data2, options2);
+      }
+    
+</script>
+    
+    
+</body>
+</html>
