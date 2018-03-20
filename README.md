@@ -8,3 +8,9 @@ As part of the project the following was undertaken:
 - Development and hosting of Python Flask application via AWS EC2 instance
 - Use of DublinBikes and OpenWeatherMaps APIs
 - Use of AWS S3 for backup storage
+
+## Scraper Screenshot
+<img src="./scraper.png"/>
+
+## Site Screenshot
+<img src="./bikes.png"/>
