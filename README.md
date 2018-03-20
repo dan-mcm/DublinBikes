@@ -10,7 +10,9 @@ As part of the project the following was undertaken:
 - Use of AWS S3 for backup storage
 
 ## Scraper Screenshot
-<img src="./scraper.png"/>
+<img src="./scraper-stations.png"/>
 
-## Site Screenshot
+<img src="./scraper-weather.png"/>
+
+## Website Screenshot
 <img src="./bikes.png"/>
