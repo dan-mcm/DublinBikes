@@ -9,7 +9,7 @@ As part of the project the following was undertaken:
 - Use of DublinBikes and OpenWeatherMaps APIs
 - Use of AWS S3 for backup storage
 
-## Scraper Screenshot
+## Scraper Screenshots
 <img src="./scraper-stations.png"/>
 
 <img src="./scraper-weather.png"/>
